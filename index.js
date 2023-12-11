@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const { Sequelize, DataTypes } = require('sequelize');
 const RepositoryModel = require('./models/repository');
 const UserModel = require('./models/user');
-const GitHubEventModel = require('./models/githubevent')
+const handleCommits = require('./handleCommit');
 
 
 const app = express();
@@ -71,6 +71,25 @@ app.post('/webhook', async (req, res) => {
       url: payload.sender.url,
       login: payload.sender.login,
     });
+
+    // Inside your event handling logic where you receive GitHub events
+    const commitsData = payload.commits; // Access the commits array from the event data
+    
+    if (commitsData && commitsData.length > 0) {
+      handleCommits(commitsData)
+        .then(() => {
+          console.log('Commits handling completed');
+          // Any further processing or response logic here
+        })
+        .catch(error => {
+          console.error('Error handling commits:', error);
+          // Handle the error or send an appropriate response
+        });
+    } else {
+      console.log('No commits found in the payload');
+      // Handle the case where no commits are present
+    }
+    
 
     
     
