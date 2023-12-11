@@ -17,8 +17,9 @@ const sequelize = new Sequelize({
 
 // Define the GitHubEvent model
 const GitHubEvent = sequelize.define('GitHubEvent', {
-  eventName: DataTypes.STRING,
-  action: DataTypes.STRING,
+  repository: DataTypes.JSONB,
+  sender: DataTypes.JSONB,
+  payloadData: DataTypes.JSONB,
 });
 
 app.use(bodyParser.json());
@@ -43,8 +44,14 @@ app.get('/', async(req, res) => {
 app.post('/webhook', async (req, res) => {
   try {
     const payload = req.body;
+    const { repository, sender } = payload;
     // Create a new GitHubEvent instance and save it to the database
-    const newEvent = await GitHubEvent.create({ eventName: payload.eventName, action: payload.action });
+    const newEvent = await GitHubEvent.create(
+      { 
+        repository,
+        sender,
+        payloadData: payload
+       });
     console.log('Webhook data inserted into PostgreSQL using Sequelize');
     res.status(200).send('Webhook received and stored in PostgreSQL using Sequelize');
   } catch (error) {

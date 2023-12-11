@@ -9,12 +9,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      eventName: {
-        type: Sequelize.STRING
-      },
-      action: {
-        type: Sequelize.STRING
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -23,6 +17,19 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
+    });
+    // Add new columns to the GitHubEvents table
+    await queryInterface.addColumn('GitHubEvents', 'repository', {
+      type: Sequelize.JSONB,
+      allowNull: true,
+    });
+    await queryInterface.addColumn('GitHubEvents', 'sender', {
+      type: Sequelize.JSONB,
+      allowNull: true,
+    });
+    await queryInterface.addColumn('GitHubEvents', 'payloadData', {
+      type: Sequelize.JSONB,
+      allowNull: true,
     });
   },
   async down(queryInterface, Sequelize) {
