@@ -1,6 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Sequelize, DataTypes } = require('sequelize');
+const RepositoryModel = require('./models/repository');
+const UserModel = require('./models/user');
+const GitHubEventModel = require('./models/githubevent')
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +25,9 @@ const GitHubEvent = sequelize.define('GitHubEvent', {
   sender: DataTypes.JSONB,
   payloadData: DataTypes.JSONB,
 });
+
+const Repository = RepositoryModel(sequelize, Sequelize);
+const User = UserModel(sequelize, Sequelize);
 
 app.use(bodyParser.json());
 
@@ -46,12 +53,29 @@ app.post('/webhook', async (req, res) => {
     const payload = req.body;
     const { repository, sender } = payload;
     // Create a new GitHubEvent instance and save it to the database
-    const newEvent = await GitHubEvent.create(
-      { 
+    const newEvent = await GitHubEvent.create({ 
         repository,
         sender,
         payloadData: payload
        });
+
+    // Create or update repositories and users
+    await Repository.upsert({
+      id: data.repository.id,
+      url: data.repository.url,
+      name: data.repository.name,
+    });
+
+    await User.upsert({
+      id: data.sender.id,
+      url: data.sender.url,
+      login: data.sender.login,
+    });
+
+    
+    
+    
+    
     console.log('Webhook data inserted into PostgreSQL using Sequelize');
     res.status(200).send('Webhook received and stored in PostgreSQL using Sequelize');
   } catch (error) {

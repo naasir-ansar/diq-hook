@@ -11,7 +11,7 @@ env:
   GKE_ZONE: us-central1
   DEPLOYMENT_NAME: node-app
   CONTAINER: node-app
-  TAG: v3.0.1
+  TAG: v3.0.2
 
 jobs:
   update-gke:
