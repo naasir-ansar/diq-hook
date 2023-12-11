@@ -1,0 +1,35 @@
+name: Deploy to TEST GKE
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+
+env:
+  GKE_CLUSTER: test-cluster-iit    
+  GKE_ZONE: us-central1
+  DEPLOYMENT_NAME: node-app
+  CONTAINER: node-app
+  TAG: v3.0.0  
+
+jobs:
+  update-gke:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2.0.0
+        with:
+          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
+      - name: Set up GKE credentials
+        uses: google-github-actions/get-gke-credentials@v1
+        with:
+          cluster_name: ${{ env.GKE_CLUSTER }}
+          location: ${{ env.GKE_ZONE }}
+          
+      - name: Deploy
+        run: |-
+          kubectl set image deployment/$DEPLOYMENT_NAME $CONTAINER=us-central1-docker.pkg.dev/iit-cc/iit-cc/node-app:${{ env.TAG }}
+          kubectl rollout status deployment/$DEPLOYMENT_NAME
+          kubectl get services -o wide
