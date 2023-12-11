@@ -61,15 +61,15 @@ app.post('/webhook', async (req, res) => {
 
     // Create or update repositories and users
     await Repository.upsert({
-      id: data.repository.id,
-      url: data.repository.url,
-      name: data.repository.name,
+      id: payload.repository.id,
+      url: payload.repository.url,
+      name: payload.repository.name,
     });
 
     await User.upsert({
-      id: data.sender.id,
-      url: data.sender.url,
-      login: data.sender.login,
+      id: payload.sender.id,
+      url: payload.sender.url,
+      login: payload.sender.login,
     });
 
     
