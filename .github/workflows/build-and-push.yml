@@ -6,7 +6,7 @@ on:
       - main  # Replace with your branch
 
 env:
-  TAG: v3.2.0
+  TAG: v3.2.1
   IMAGE: node-app
 
 

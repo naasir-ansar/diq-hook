@@ -6,6 +6,7 @@ const UserModel = require('./models/user');
 const handleCommits = require('./handleCommit');
 const handlePullRequestOpened = require('./handlePullRequestOpened');
 const sequelize = require('./db');
+const handlePullRequestClosed = require('./handlePullRequestClosed');
 
 
 const app = express();
@@ -36,7 +37,7 @@ app.get('/test', async(req, res) => {
 
 app.get('/', async(req, res) => {
   try {
-    res.send("Webhook Impl");
+    res.send("Application Healthy");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -47,12 +48,7 @@ app.post('/webhook', async (req, res) => {
   try {
     const payload = req.body;
     const { repository, sender } = payload;
-    // Create a new GitHubEvent instance and save it to the database
-    const newEvent = await GitHubEvent.create({ 
-        repository,
-        sender,
-        payloadData: payload
-       });
+    
 
     // Create or update repositories and users
     await Repository.upsert({
@@ -79,14 +75,13 @@ app.post('/webhook', async (req, res) => {
         handlePullRequestOpened(payload);
       } else if (action === 'closed') {
         // Logic for when a pull request is closed
+        handlePullRequestClosed(payload);
       } else {
         // Handle other actions as needed
       }
-    }
+    } else {
 
-    
-
-    // Inside your event handling logic where you receive GitHub events
+      // Inside your event handling logic where you receive GitHub events
     const commitsData = payload.commits; // Access the commits array from the event data
     
     if (commitsData && commitsData.length > 0) {
@@ -101,8 +96,10 @@ app.post('/webhook', async (req, res) => {
         });
     } else {
       console.log('No commits found in the payload');
-      // Handle the case where no commits are present
     }
+      
+    }
+
     
     console.log('Webhook data inserted into PostgreSQL using Sequelize');
     res.status(200).send('Webhook received and stored in PostgreSQL using Sequelize');
