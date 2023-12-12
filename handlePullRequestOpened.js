@@ -19,9 +19,9 @@ async function handlePullRequestOpened(payload) {
       additions,
       deletions,
       changed_files,
-      repository: { id: Repository },
-      sender: { login: sender },
     },
+    repository: { id: Repository },
+    sender: { login: sender },
   } = payload;
 
   try {

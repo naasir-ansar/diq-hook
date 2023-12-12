@@ -69,7 +69,7 @@ app.post('/webhook', async (req, res) => {
 
     const eventType = req.get('X-GitHub-Event');
     
-    if (eventType === 'pull_request') {
+    if (eventType && eventType === 'pull_request') {
       // The received event is a pull_request event
       const action = payload.action;
 

@@ -4,7 +4,7 @@ const {
 const sequelize = require('../db');
 // models/Repository.js
 module.exports = (sequelize, DataTypes) => {
-  const Commit = sequelize.define('Commits', {
+  const Commit = sequelize.define('Commit', {
     Id: {
       type: DataTypes.STRING,
       primaryKey: true,
