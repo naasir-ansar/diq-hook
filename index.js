@@ -4,20 +4,13 @@ const { Sequelize, DataTypes } = require('sequelize');
 const RepositoryModel = require('./models/repository');
 const UserModel = require('./models/user');
 const handleCommits = require('./handleCommit');
+const handlePullRequestOpened = require('./handlePullRequestOpened');
+const sequelize = require('./db');
 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize Sequelize with your configuration
-const sequelize = new Sequelize({
-  dialect: 'postgres',
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
 
 // Define the GitHubEvent model
 const GitHubEvent = sequelize.define('GitHubEvent', {
@@ -26,8 +19,10 @@ const GitHubEvent = sequelize.define('GitHubEvent', {
   payloadData: DataTypes.JSONB,
 });
 
-const Repository = RepositoryModel(sequelize, Sequelize);
-const User = UserModel(sequelize, Sequelize);
+// create required tables
+const Repository = RepositoryModel(sequelize, sequelize.DataTypes);
+const User = UserModel(sequelize, sequelize.DataTypes);
+
 
 app.use(bodyParser.json());
 
@@ -72,6 +67,25 @@ app.post('/webhook', async (req, res) => {
       login: payload.sender.login,
     });
 
+    const eventType = req.get('X-GitHub-Event');
+    
+    if (eventType === 'pull_request') {
+      // The received event is a pull_request event
+      const action = payload.action;
+
+      // Handle the pull_request event based on the action
+      // Implement your logic based on different actions (e.g., opened, closed)
+      if (action === 'opened') {
+        handlePullRequestOpened(payload);
+      } else if (action === 'closed') {
+        // Logic for when a pull request is closed
+      } else {
+        // Handle other actions as needed
+      }
+    }
+
+    
+
     // Inside your event handling logic where you receive GitHub events
     const commitsData = payload.commits; // Access the commits array from the event data
     
@@ -89,11 +103,6 @@ app.post('/webhook', async (req, res) => {
       console.log('No commits found in the payload');
       // Handle the case where no commits are present
     }
-    
-
-    
-    
-    
     
     console.log('Webhook data inserted into PostgreSQL using Sequelize');
     res.status(200).send('Webhook received and stored in PostgreSQL using Sequelize');
