@@ -8,6 +8,7 @@ const handlePullRequestOpened = require('./handlePullRequestOpened');
 const sequelize = require('./db');
 const handlePullRequestClosed = require('./handlePullRequestClosed');
 const handleRelease = require('./handleRelease');
+const handleCodeScan = require('./handleCodeScan');
 
 
 const app = express();
@@ -102,6 +103,12 @@ app.post('/webhook', async (req, res) => {
             handleRelease(payload);
           }
 
+        }
+
+        if (eventType === 'code_scanning_alert') {
+          if (action === 'created') {
+            handleCodeScan(payload);
+          }
         }
       }
     }
