@@ -6,7 +6,7 @@ on:
       - main  # Replace with your branch
 
 env:
-  TAG: 3.0.0
+  TAG: 3.0.1
   IMAGE: node-app
 
 
@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4.1.1
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3.0.0
+        uses: docker/setup-buildx-action@v3.0.1
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2.0.0
