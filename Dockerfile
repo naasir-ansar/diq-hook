@@ -8,6 +8,7 @@ ENV DB_USER=${DB_USER}
 ENV DB_PASSWORD=${DB_PASSWORD}
 ENV DB_NAME=${DB_NAME}
 ENV PORT=8080
+ENV NODE_ENV=${ENV}
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
