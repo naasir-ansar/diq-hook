@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 
 app.get('/test', async(req, res) => {
   try {
-    res.send("hello GKE!");
+    res.send("hello GKE! with blue- green mode");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
