@@ -8,6 +8,17 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
+      color:
+        description: 'Deployment type blue/green'
+        # Default value if no value is explicitly provided
+        default: 'green'
+        # Input has to be provided for the workflow to run
+        required: false
+        # The data type of the input
+        type: choice
+        options:
+          - blue
+          - green
       tag:
         # Friendly description to be shown in the UI instead of 'name'
         description: 'Deploy Version'
