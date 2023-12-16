@@ -1,6 +1,6 @@
 # This is a basic workflow that is manually triggered
 
-name: Deploy to Production
+name: Removing Redundent Deployment
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -8,23 +8,21 @@ on:
   workflow_dispatch:
     # Inputs the workflow accepts.
     inputs:
-      tag:
-        # Friendly description to be shown in the UI instead of 'name'
-        description: 'Deploy Version'
+      color:
+        description: 'Removal Deployment type blue/green'
         # Default value if no value is explicitly provided
-        default: '3.0.0'
+        default: 'green'
         # Input has to be provided for the workflow to run
         required: true
         # The data type of the input
-        type: string
-
+        type: choice
+        options:
+          - blue
+          - green
+  
 env:
-  IMAGE: node-app
   GKE_CLUSTER: prod-cluster-iit    
   GKE_ZONE: us-central1
-  DEPLOYMENT_NAME: node-app
-  CONTAINER: node-app
-  REPO: us-central1-docker.pkg.dev/iit-cc/iit-cc 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -52,31 +50,16 @@ jobs:
           location: ${{ env.GKE_ZONE }}
 
       # Deploy the Docker image to the GKE cluster
-      - name: Deploy Blue/Green to Kubernetes
+      - name: Remove Blue/Green from Kubernetes
         run: |
           # Determine which color to deploy based on input color
           if [ "${{ github.event.inputs.color }}" == blue ]; then
-            kubectl apply -f deployments/node-blue.yaml
-            # Enforce Application version
-            kubectl set image deployment/node-app-blue $CONTAINER=$REPO/node-app:'${{ inputs.tag }}'
-            kubectl rollout status deployment/node-app-blue
+            kubectl delete -f deployments/node-blue.yaml
           elif [ "${{ github.event.inputs.color }}" == green ]; then
-            kubectl apply -f deployments/node-green.yaml
-            # Enforce Application version
-            kubectl set image deployment/node-app-green $CONTAINER=$REPO/node-app:'${{ inputs.tag }}'
-            kubectl rollout status deployment/node-app-green
+            kubectl delete -f deployments/node-green.yaml
           else
             echo "Invalid color provided. Please provide 'blue' or 'green'."
             exit 1
           fi
-
-      - name: Update Ingress for Traffic Switching
-        if: success()
-        run: |
-          if [ "${{ github.event.inputs.color }}" == blue ]; then
-            kubectl apply -f deployments/node-ingress-blue.yaml
-          else
-            kubectl apply -f deployments/node-ingress-green.yaml
-          fi
           
-  
+    
