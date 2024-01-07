@@ -54,9 +54,9 @@ jobs:
         run: |
           # Determine which color to deploy based on input color
           if [ "${{ github.event.inputs.color }}" == blue ]; then
-            kubectl delete deployment node-app-blue
+            kubectl delete -f deployments/node-version-blue.yaml
           elif [ "${{ github.event.inputs.color }}" == green ]; then
-            kubectl delete deployment node-app-green
+            kubectl delete -f deployments/node-version-green.yaml
           else
             echo "Invalid color provided. Please provide 'blue' or 'green'."
             exit 1

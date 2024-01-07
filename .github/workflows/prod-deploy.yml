@@ -81,3 +81,11 @@ jobs:
             exit 1
           fi
   
+      - name: Update Service for Traffic Switching
+        if: success()
+        run: |
+          if [ "${{ github.event.inputs.color }}" == blue ]; then
+            kubectl apply -f deployments/svc-blue.yaml
+          else
+            kubectl apply -f deployments/svc-green.yaml
+          fi
