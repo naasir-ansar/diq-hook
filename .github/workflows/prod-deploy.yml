@@ -67,12 +67,12 @@ jobs:
         run: |
           # Determine which color to deploy based on input color
           if [ "${{ github.event.inputs.color }}" == blue ]; then
-            kubectl apply -f deployments/node-blue.yaml
+            kubectl apply -f deployments/node-version-blue.yaml
             # Enforce Application version
             kubectl set image deployment/node-app-blue $CONTAINER=$REPO/node-app:'${{ inputs.tag }}'
             kubectl rollout status deployment/node-app-blue
           elif [ "${{ github.event.inputs.color }}" == green ]; then
-            kubectl apply -f deployments/node-green.yaml
+            kubectl apply -f deployments/node-version-green.yaml
             # Enforce Application version
             kubectl set image deployment/node-app-green $CONTAINER=$REPO/node-app:'${{ inputs.tag }}'
             kubectl rollout status deployment/node-app-green
@@ -80,14 +80,4 @@ jobs:
             echo "Invalid color provided. Please provide 'blue' or 'green'."
             exit 1
           fi
-
-      - name: Update Ingress for Traffic Switching
-        if: success()
-        run: |
-          if [ "${{ github.event.inputs.color }}" == blue ]; then
-            kubectl apply -f deployments/node-ingress-blue.yaml
-          else
-            kubectl apply -f deployments/node-ingress-green.yaml
-          fi
-          
   
