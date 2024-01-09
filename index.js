@@ -39,7 +39,7 @@ app.get('/test', async(req, res) => {
 
 app.get('/', async(req, res) => {
   try {
-    res.send("Application Healthy");
+    res.send("Application Healthy! Version- 5.0.0");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
