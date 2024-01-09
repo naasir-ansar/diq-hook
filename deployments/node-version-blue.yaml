@@ -51,26 +51,5 @@ spec:
                   key: ENV
         resources: {}
 status: {}
----
-apiVersion: "autoscaling/v2"
-kind: "HorizontalPodAutoscaler"
-metadata:
-  name: "node-app-hpa-wvpn"
-  namespace: "default"
-  labels:
-    app: "node-app"
-spec:
-  scaleTargetRef:
-    kind: "Deployment"
-    name: "node-app-blue"
-    apiVersion: "apps/v1"
-  minReplicas: 1
-  maxReplicas: 5
-  metrics:
-  - type: "Resource"
-    resource:
-      name: "cpu"
-      target:
-        type: "Utilization"
-        averageUtilization: 80
+
 
